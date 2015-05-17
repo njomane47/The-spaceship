@@ -119,3 +119,173 @@ void DrawShip(SpaceShip &ship)
 	//al_draw_filled_rectangle(ship.x - ship.boundx, ship.y - ship.boundy, ship.x + ship.boundx, ship.y + ship.boundy, al_map_rgba(255, 0, 255,100)); //helps you get the boundry box of your ship or any bit map
 
 
+}
+void MoveShipUp(SpaceShip &ship)
+{
+	ship.animationRow = 0;
+	ship.y -= ship.speed;
+	if (ship.y < 0) // if it trys to go off the screen
+		ship.y = 0;
+
+}
+void MoveShipDown(SpaceShip &ship)
+{
+	ship.animationRow = 2;
+	ship.y += ship.speed;
+	if (ship.y > HEIGHT) // greater then the screen hieght 
+		ship.y = HEIGHT;
+}
+void MoveShipLeft(SpaceShip &ship)
+{
+	ship.curFrame = 2;
+	ship.x -= ship.speed;
+	if (ship.x < 0)
+		ship.x = 0;
+}
+void MoveShipRight(SpaceShip &ship)
+{
+	ship.curFrame = 1;
+	ship.x += ship.speed;
+	if (ship.x > 300) // limmits how far the user is gonna go
+		ship.x = 300;
+}
+
+void InitBullet(Bullet bullet[], int size)
+{
+	for (int i = 0; i < size; i++)
+	{
+		bullet[i].ID = BULLET;
+		bullet[i].speed = 10;
+		bullet[i].live = false;
+
+	}
+}
+void DrawBullet(Bullet bullet[], int size)
+{
+	for (int i = 0; i < size; ++i)
+	{
+		al_draw_filled_circle(bullet[i].x, bullet[i].y, 2, al_map_rgb(255, 255, 255));
+	}
+}
+void FireBullet(Bullet bullet[], int size, SpaceShip &ship)
+{
+	for (int i = 0; i < size; i++)
+	{
+		if (!bullet[i].live)
+		{
+			bullet[i].x = ship.x + 17;
+			bullet[i].y = ship.y;
+			bullet[i].live = true;
+			break;
+		}
+	}
+}
+void UpdateBullet(Bullet bullet[], int size)
+{
+	for (int i = 0; i < size; ++i)
+	{
+		if (bullet[i].live)
+		{
+			bullet[i].x += bullet[i].speed;
+			if (bullet[i].x > WIDTH)
+			{
+				bullet[i].live = false;
+			}
+		}
+	}
+}
+void CollideBullet(Bullet bullet[], int bSize, Comet comets[], int cSize, SpaceShip &ship)
+{
+	for (int i = 0; i < bSize; i++)
+	{
+		if (bullet[i].live)
+		{
+			for (int j = 0; j < cSize; j++)
+			{ //bulet dont have a bounding box
+				if (comets[j].live)
+				{	//the bullets x position has to be greater then the comets left side ||| * |
+					if (bullet[i].x >(comets[j].x - comets[j].boundx) && bullet[i].y < (comets[j].y + comets[j].boundy) && bullet[i].x <(comets[j].x + comets[j].boundx) && bullet[i].y >(comets[j].y - comets[j].boundy))
+					{
+						bullet[i].live = false;
+						comets[j].live = false;
+						ship.score++;
+					}
+				}
+			}
+		}
+	}
+}
+
+void InitComet(Comet comets[], int size)
+{
+	for (int i = 0; i < size; ++i)
+	{
+		comets[i].ID = ENEMY;
+		comets[i].live = false;
+		comets[i].speed = 8;
+		comets[i].boundx = 18;
+		comets[i].boundy = 18;
+	}
+
+}
+void DrawComet(Comet comets[], int size)
+{
+	for (int i = 0; i < size; ++i)
+	{
+		if (comets[i].live) // we only want to draw them when they are live
+		{
+			al_draw_filled_circle(comets[i].x, comets[i].y, 20, al_map_rgb(255, 0, 0));
+		}
+	}
+
+}
+void StartComet(Comet comets[], int size)
+{
+	for (int i = 0; i < size; i++)
+	{
+		if (!comets[i].live)
+		{
+			if (rand() % 500 == 0) // if the random number ranging form 0 to 500 is equal to 0
+			{
+				comets[i].live = true;
+				comets[i].x = WIDTH;
+				comets[i].y = 30 + rand() % (HEIGHT - 60);
+				break;
+			}
+		}
+	}
+}
+void UpdateComet(Comet comets[], int size)
+{
+	for (int i = 0; i < size; i++)
+	{
+		if (comets[i].live)
+		{
+			comets[i].x -= comets[i].speed;
+			if (comets[i].x < 0)// as we update if is at the end of the screen kill the comet
+			{
+				comets[i].live = false;
+			}
+		}
+	}
+}
+void CollideComet(Comet comets[], int cSize, SpaceShip &ship)
+{
+	for (int i = 0; i < cSize; ++i)
+	{
+		if (comets[i].live)
+		{
+			if (comets[i].x - comets[i].boundx < ship.x + ship.boundx && comets[i].x + comets[i].boundx > ship.x - ship.boundx && comets[i].y - comets[i].boundy < ship.y + ship.boundy && comets[i].y + comets[i].boundx > ship.y - ship.boundy)
+			{
+				ship.lives--;
+				comets[i].live = false;
+			}
+		}
+		else if (comets[i].x < 0)
+		{
+
+			comets[i].live = false;
+			//ship.lives--;
+		}
+	}
+}
