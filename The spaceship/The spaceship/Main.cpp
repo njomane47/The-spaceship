@@ -59,6 +59,45 @@ int main()
 	ALLEGRO_FONT *font18 = NULL;
 	ALLEGRO_BITMAP *shipimage = NULL;
 
+	//Initialization Functions
+	if (!al_init())
+	{
+		return -1;								//init Allegro
+	}
+
+	display = al_create_display(WIDTH, HEIGHT);//create our display
+
+	if (!display)
+	{
+		return -1;
+	}
+
+	al_init_primitives_addon();
+	al_install_keyboard();
+	al_init_font_addon();
+	al_init_ttf_addon();
+	al_init_image_addon();
+
+
+	event_queue = al_create_event_queue();
+	timer = al_create_timer(1.0 / FPS);
+
+	shipimage = al_load_bitmap("Kepler-sprite.png");
+	al_convert_mask_to_alpha(shipimage, al_map_rgb(255, 0, 255));
+
+
+
+	srand(time(NULL));// seeds the randam num generator with the current time
+	InitShip(ship, shipimage);//init ship object
+	InitBullet(bullets, NUM_BULLETS);
+	InitComet(comets, NUM_COMETS);
+
+	font18 = al_load_font("Yorkville.ttf", 18, NULL);
+
+	al_register_event_source(event_queue, al_get_keyboard_event_source());//register keyboard
+	al_register_event_source(event_queue, al_get_timer_event_source(timer));//register timer
+	al_register_event_source(event_queue, al_get_display_event_source(display));//register display
+
 
 
 
