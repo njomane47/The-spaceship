@@ -13,6 +13,32 @@ const int NUM_COMETS = 10;
 enum KEYS{ UP, DOWN, LEFT, RIGHT, SPACE };
 bool keys[5] = { false, false, false, false, false };
 
+
+//prototypes
+void InitShip(SpaceShip &ship, ALLEGRO_BITMAP *image);
+void DrawShip(SpaceShip &ship);
+void MoveShipUp(SpaceShip &ship);
+void MoveShipDown(SpaceShip &ship);
+void MoveShipLeft(SpaceShip &ship);
+void MoveShipRight(SpaceShip &ship);
+void ResetShipAnimation(SpaceShip &ship, int position);
+
+
+void InitBullet(Bullet bullet[], int size);
+void DrawBullet(Bullet bullet[], int size);
+void FireBullet(Bullet bullet[], int size, SpaceShip &ship);
+void UpdateBullet(Bullet bullet[], int size);
+void CollideBullet(Bullet bullet[], int bSize, Comet comets[], int cSize, SpaceShip &ship);
+
+
+void InitComet(Comet comets[], int size);
+void DrawComet(Comet comets[], int size);
+void StartComet(Comet comets[], int size);
+void UpdateComet(Comet comets[], int size);
+void CollideComet(Comet comets[], int cSize, SpaceShip &ship);
+
+
+
 int main()
 {
 
