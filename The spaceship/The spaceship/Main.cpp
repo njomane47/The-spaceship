@@ -106,12 +106,149 @@ int main()
 	al_register_event_source(event_queue, al_get_timer_event_source(timer));//register timer
 	al_register_event_source(event_queue, al_get_display_event_source(display));//register display
 
+	al_start_timer(timer); // start your timer
+	while (!done)
+	{
+		ALLEGRO_EVENT ev;
+		al_wait_for_event(event_queue, &ev);
+
+		if (ev.type == ALLEGRO_EVENT_TIMER) /// our object is only going to run 1/60 th time a second  , update section
+		{
+			redraw = true;
+			if (keys[UP])
+				MoveShipUp(ship);
+			else if (keys[DOWN])
+				MoveShipDown(ship);
+			else
+			{
+				ResetShipAnimation(ship, 1);
+			}
+
+			if (keys[LEFT])
+				MoveShipLeft(ship);
+			else if (keys[RIGHT])
+				MoveShipRight(ship);
+			else
+			{
+				ResetShipAnimation(ship, 2);
+			}
+
+			if (!isGameOver)
+			{
+				//FireBullet(bullets, NUM_BULLETS, ship);
+				UpdateBullet(bullets, NUM_BULLETS);
+				StartComet(comets, NUM_COMETS);
+				StartComet(comets, NUM_COMETS);
+				Updateenemy(enemys, NUM_COMETS);
+				Updateenemy(enemys, NUM_COMETS);
+				// update and then check for collisons
+				CollideBullet(bullets, NUM_BULLETS, comets, NUM_COMETS, ship);
+				CollideComet(comets, NUM_COMETS, ship);
+
+				if (ship.lives <= 0)
+				{
+					isGameOver = true;
+				}
+			}
+		}
+		else if (ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
+		{
+			done = true;
+		}
+		else if (ev.type == ALLEGRO_EVENT_KEY_DOWN)
+		{
+			switch (ev.keyboard.keycode)// when key is released
+			{
+			case ALLEGRO_KEY_ESCAPE:
+				done = true;
+				break;
+			case ALLEGRO_KEY_UP:
+				keys[UP] = true;
+				break;
+			case ALLEGRO_KEY_DOWN:
+				keys[DOWN] = true;
+				break;
+			case ALLEGRO_KEY_LEFT:
+				keys[LEFT] = true;
+				break;
+			case ALLEGRO_KEY_RIGHT:
+				keys[RIGHT] = true;
+				//MoveShipRight(ship);
+				break;
+			case ALLEGRO_KEY_SPACE:
+				keys[SPACE] = true;
+				FireBullet(bullets, NUM_BULLETS, ship);
+
+				break;
+			}
+		}
+		else if (ev.type == ALLEGRO_EVENT_KEY_UP) /// when key is released
+		{
+			switch (ev.keyboard.keycode)
+			{
+			case ALLEGRO_KEY_ESCAPE:
+				done = true;
+				break;
+			case ALLEGRO_KEY_UP:
+				keys[UP] = false;
+				break;
+			case ALLEGRO_KEY_DOWN:
+				keys[DOWN] = false;
+				break;
+			case ALLEGRO_KEY_LEFT:
+				keys[LEFT] = false;
+				break;
+			case ALLEGRO_KEY_RIGHT:
+				keys[RIGHT] = false;
+				break;
+			case ALLEGRO_KEY_SPACE:
+				keys[SPACE] = false;
+				break;
+			}
+
+		}
+
+		if (redraw && al_is_event_queue_empty(event_queue))
+		{
+			//ALLEGRO_BITMAP*backgroud = al_load_bitmap("BACKGROUND.png");
+			al_draw_bitmap(backgroud, BackSpeed, 0, NULL);
+
+
+			redraw = false;
+
+			if (!isGameOver)
+			{
+				DrawShip(ship);
+				DrawBullet(bullets, NUM_BULLETS);
+				DrawComet(comets, NUM_COMETS);
+				Drawenemy(enemys, NUM_COMETS)
+
+					al_draw_textf(font18, al_map_rgb(0, 0, 255), 5, 5, 0, "Player has  %i  lives left.  Player has destroyed  %i  object", ship.lives, ship.score);
+			}
+			else
+			{
+
+				al_draw_textf(font18, al_map_rgb(0, 255, 255), WIDTH / 2, HEIGHT / 2, ALLEGRO_ALIGN_CENTRE, "GAME OVER , SON OF A GUN !! , Final Score %i", ship.score);
+			}
+			al_flip_display();
+			al_clear_to_color(al_map_rgb(0, 0, 0));
+		}
 
 
 
 
 
-	return 0;
+
+	}
+	al_destroy_bitmap(backgroud);
+	al_destroy_bitmap(shipimage);
+	al_destroy_event_queue(event_queue);
+	al_destroy_timer(timer);
+	al_destroy_font(font18);
+	al_destroy_display(display); //destroy our display object
+
+
+return 0;
 }
 
 //definition
@@ -152,7 +289,7 @@ void ResetShipAnimation(SpaceShip &ship, int position)
 }
 void DrawShip(SpaceShip &ship)
 {
-	al_draw_filled_rectangle(ship.x, ship.y - 9, ship.x + 10, ship.y - 7, al_map_rgb(255, 255, 0));
+	/*al_draw_filled_rectangle(ship.x, ship.y - 9, ship.x + 10, ship.y - 7, al_map_rgb(255, 255, 0));
 	al_draw_filled_rectangle(ship.x, ship.y + 9, ship.x + 10, ship.y + 7, al_map_rgb(255, 255, 0));
 
 	al_draw_filled_triangle(ship.x - 12, ship.y - 17, ship.x + 12, ship.y, ship.x - 12, ship.y + 17, al_map_rgb(0, 255, 0));
@@ -163,7 +300,7 @@ void DrawShip(SpaceShip &ship)
 
 	al_draw_bitmap_region(ship.image, fx, fy, ship.frameWidth, ship.frameHeight, ship.x - ship.frameWidth / 2, ship.y - ship.frameHeight / 2, 0);
 
-	al_draw_filled_rectangle(ship.x - ship.boundx, ship.y - ship.boundy, ship.x + ship.boundx, ship.y + ship.boundy, al_map_rgba(255, 0, 255,100)); //helps you get the boundry box of your ship or any bit map
+	//al_draw_filled_rectangle(ship.x - ship.boundx, ship.y - ship.boundy, ship.x + ship.boundx, ship.y + ship.boundy, al_map_rgba(255, 0, 255,100)); //helps you get the boundry box of your ship or any bit map
 
 
 }
@@ -332,6 +469,84 @@ void CollideComet(Comet comets[], int cSize, SpaceShip &ship)
 		{
 
 			comets[i].live = false;
+			//ship.lives--;
+		}
+	}
+}
+void Initenemy(enemy enemys[], int size)
+{
+	for (int i = 0; i < size; ++i)
+	{
+		enemys[i].ID = ENEMY;
+		enemys[i].live = false;
+		enemys[i].speed = 8;
+		enemys[i].boundx = 18;
+		enemys[i].boundy = 18;
+	}
+
+}
+void Drawenemy(enemy enemys[], int size)
+{
+	for (int i = 0; i < size; ++i)
+	{
+		if (enemys[i].live) // we only want to draw them when they are live
+		{
+			al_draw_filled_circle(enemys[i].x, enemys[i].y, 20, al_map_rgb(255, 0, 0));
+		}
+	}
+
+}
+void Startenemy(enemy enemys[], int size)
+{
+	for (int i = 0; i < size; i++)
+	{
+		if (!enemys[i].live)
+		{
+			if (rand() % 500 == 0) // if the random number ranging form 0 to 500 is equal to 0
+			{
+				enemys[i].live = true;
+				enemys[i].x = 30 + rand() % (WIDTH - 60);//
+				enemys[i].y = HEIGHT;
+				//comets[i].x = WIDTH;//
+				//comets[i].y = 30 + rand() % (HEIGHT - 60);
+				break;
+			}
+		}
+	}
+}
+
+void UpdateComet(enemy enemys[], int size)
+{
+	for (int i = 0; i < size; i++)
+	{
+		if (enemys[i].live)
+		{
+			enemys[i].y -= enemys[i].speed;
+			//comets[i].x -= comets[i].speed;
+			if (enemys[i].y < 0)// as we update if is at the end of the screen kill the comet
+			{
+				enemys[i].live = false;
+				//comets[i].y += comets[i].speed;
+			}
+		}
+	}
+}
+void Collideenemy(enemy enemys[], int cSize, SpaceShip &ship)
+{
+	for (int i = 0; i < cSize; ++i)
+	{
+		if (enemys[i].live)
+		{
+			if (enemys[i].x - enemys[i].boundx < ship.x + ship.boundx && enemys[i].x + enemys[i].boundx > ship.x - ship.boundx && enemys[i].y - enemys[i].boundy < ship.y + ship.boundy && enemys[i].y + enemys[i].boundx > ship.y - ship.boundy)
+			{
+				ship.lives--;
+				enemys[i].live = false;
+			}
+		}
+		else if (enemys[i].x < 0)
+		{
+
+			enemys[i].live = false;
 			//ship.lives--;
 		}
 	}
