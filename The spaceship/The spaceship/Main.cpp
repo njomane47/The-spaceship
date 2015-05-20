@@ -2,7 +2,7 @@
 #include<allegro5\allegro_primitives.h>
 #include <allegro5\allegro_font.h>
 #include <allegro5\allegro_ttf.h>
-#include <allegro5\allegro_image.h>;
+#include <allegro5\allegro_image.h>
 #include "objects.h"
 
 
@@ -35,6 +35,14 @@ void DrawComet(Comet comets[], int size);
 void StartComet(Comet comets[], int size);
 void UpdateComet(Comet comets[], int size);
 void CollideComet(Comet comets[], int cSize, SpaceShip &ship);
+
+
+void Initenemy(enemy enemys[], int size);
+void Drawenemy(enemy eneyms[], int size);
+void Startenemy(enemy enemys[], int size);
+void Updateenemy(enemy enemys[], int size);
+void Collideenemy(enemy enemys[], int cSize, SpaceShip &ship);
+
 
 int main()
 {
