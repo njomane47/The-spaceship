@@ -47,7 +47,7 @@ void Collideenemy(enemy enemys[], int cSize, SpaceShip &ship);
 int main()
 {
 
-
+	enemy enemys;
 	//primitive var
 	bool done = false;
 	bool redraw = true; // for  the timer
@@ -210,8 +210,8 @@ int main()
 
 		if (redraw && al_is_event_queue_empty(event_queue))
 		{
-			//ALLEGRO_BITMAP*backgroud = al_load_bitmap("BACKGROUND.png");
-			al_draw_bitmap(backgroud, BackSpeed, 0, NULL);
+			ALLEGRO_BITMAP*backgroud = al_load_bitmap("BACKGROUND.png");
+			al_draw_bitmap(backgroud, 0, 0, NULL);
 
 
 			redraw = false;
@@ -221,7 +221,7 @@ int main()
 				DrawShip(ship);
 				DrawBullet(bullets, NUM_BULLETS);
 				DrawComet(comets, NUM_COMETS);
-				Drawenemy(enemys, NUM_COMETS)
+				Drawenemy(enemys, NUM_COMETS);
 
 					al_draw_textf(font18, al_map_rgb(0, 0, 255), 5, 5, 0, "Player has  %i  lives left.  Player has destroyed  %i  object", ship.lives, ship.score);
 			}
@@ -240,7 +240,7 @@ int main()
 
 
 	}
-	al_destroy_bitmap(backgroud);
+	//al_destroy_bitmap(backgroud);
 	al_destroy_bitmap(shipimage);
 	al_destroy_event_queue(event_queue);
 	al_destroy_timer(timer);

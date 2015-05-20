@@ -28,7 +28,7 @@ struct SpaceShip  // this can be written as a class
 	ALLEGRO_BITMAP *image;
 };
 
-struct Bullet
+struct Bullet 
 {
 	int ID;
 	int x;
@@ -38,7 +38,7 @@ struct Bullet
 
 };
 
-struct Comet
+struct Comet //
 {
 	int ID;
 	int x;
@@ -59,6 +59,28 @@ struct Comet
 
 	ALLEGRO_BITMAP *image;
 
+};
+
+struct enemy
+{
+	int ID;
+	int x;
+	int y;
+	bool live;
+	int speed;
+	int boundx;
+	int boundy;
+
+	int maxFrame;
+	int curFrame;
+	int frameCount;
+	int frameDelay;
+	int frameWidth;
+	int frameHeight;
+	int animationColumns;
+	int animationDirection;
+
+	ALLEGRO_BITMAP *image;
 };
 struct Explosion{
 	int x;
